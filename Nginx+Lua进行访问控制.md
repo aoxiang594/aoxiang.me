@@ -17,7 +17,7 @@ location ~ \.php {
 		local uri = ngx.var.request_uri
 		if string.find(uri,"/api/register") ~= nil then
 			local body = ngx.req.get_body_data()    
-			if string.find(body,"20900103") or string.find(body,"20.1.7") or string.find(body,"HLX") or string.find(body,"8.88") then
+			if string.find(body,"20200101") or string.find(body,"20200102") or string.find(body,"9.9.9") or string.find(body,"8.8.8") then
 				ngx.exit(ngx.HTTP_NOT_FOUND)
 			end
 		end
@@ -30,3 +30,31 @@ location ~ \.php {
 这里提一个点`access_by_lua`用来进行访问控制，之前一直用`content_by_lua_block`，匹配成功以后，就不会继续执行php了。一定要用`access_by_lua`
 
 [https://github.com/openresty/lua-nginx-module](https://github.com/openresty/lua-nginx-module)
+
+
+
+
+
+2020年04月08日简单优化一下。随着盗版越来越多，盗版的关键字丢数组里
+
+```shell
+lua_need_request_body on;
+location / {  
+  access_by_lua '
+	local uri = ngx.var.request_uri
+	if string.find(uri,"/api/register") ~= nil then
+		local body = ngx.req.get_body_data()
+		local denyList = {"20200101","20200102","9.9.9","8.8.8"}
+		for i = 1,#denyList do
+			if string.find(body,denyList[i]) then
+				ngx.header.content_type = "application/json";
+                ngx.say(\'{"toast":"您正在使用盗版软件"}\');       
+                ngx.exit(ngx.HTTP_OK);
+			end
+		end
+	end
+';
+}  
+
+```
+
