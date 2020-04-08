@@ -17,4 +17,3 @@ git reset --header 82bb80c9ea80b35377ac018f86dfc220670e9699
 git checkout commit-id  files
 git checkout 82bb80c9ea80b35377ac018f86dfc220670e9699 app/Http/Controllers/Controller.php
 ```
-
