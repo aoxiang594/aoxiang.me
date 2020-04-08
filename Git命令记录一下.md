@@ -17,9 +17,18 @@ git reset --header 82bb80c9ea80b35377ac018f86dfc220670e9699
 git checkout commit-id  files
 git checkout 82bb80c9ea80b35377ac018f86dfc220670e9699 app/Http/Controllers/Controller.php
 ```
-##### 解决冲突
+#### 解决冲突
 
 最烦人的事情就是冲突了
 
+```
+git status #查看冲突文件
+git mergetool #通过合并工具来查看冲突内容
+git commit -a #合并完成以后，提交全部内容，保存退出
+git push
 
+
+```
+
+![image-20200408152238192](http://mweb.aoxiang.me/markdown/image-20200408152238192.png)
 
