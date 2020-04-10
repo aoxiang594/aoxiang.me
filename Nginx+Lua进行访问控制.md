@@ -33,7 +33,7 @@ location ~ \.php {
 
 
 
-
+---
 
 2020年04月08日简单优化一下。随着盗版越来越多，盗版的关键字丢数组里
 
@@ -56,5 +56,54 @@ location / {
 ';
 }  
 
+```
+
+
+
+细心的朋友会发现，上面的for循环中，i是从1开始的，没毛病，在很多语言中长度是从0开始，但是在lua里面，长度居然是从1开始。
+
+---
+
+2020年04月10日在优化一波，将所有处理失败的请求全部记录下来
+
+在处理这个功能的时候，发现一个神奇的bug
+
+在lua中，比如匹配`8.8.8`里面的`点`居然会匹配成任意字符，也就是说，`8d8c8`也会被匹配成功，导致有一部分用户被误判。`点`需要用`%p`来表示
+
+将错误信息，写入文件中。
+
+```shell
+file = io.open("/tmp/lua.txt", "a")
+io.output(file)
+io.write(date)
+io.write(body)
+io.close(file)
+```
+
+以下是完整代码
+
+```shell
+lua_need_request_body on;
+location / {  
+  access_by_lua '
+	local uri = ngx.var.request_uri
+	if string.find(uri,"/api/register") ~= nil then
+		local body = ngx.req.get_body_data()
+		local denyList = {"20200101","20200102","9%p9%p9"}
+		for i = 1,#denyList do
+			if string.find(body,denyList[i]) then
+					local date=os.date("%Y-%m-%d %H:%M:%S");
+          file = io.open("/tmp/lua.txt", "a")
+          io.output(file)
+          io.write(date)
+          io.write(body)
+          io.close(file)
+					ngx.header.content_type = "application/json";
+          ngx.say(\'{"toast":"您正在使用盗版软件"}\');       
+          ngx.exit(ngx.HTTP_OK);
+			end
+		end
+	end
+';
 ```
 
